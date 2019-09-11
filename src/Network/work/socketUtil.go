@@ -18,9 +18,11 @@ func BytesCombine(pBytes ...[]byte) []byte {
 }
 
 
-func ByteToInt(by []byte, num *int32)  {
+func ByteToInt(by []byte) int32 {
 	buf := bytes.NewBuffer(by)
-	binary.Read(buf, binary.BigEndian, num)
+	var num int32
+	binary.Read(buf, binary.BigEndian, &num)
+	return num
 }
 
 func IntToByte(num *int32) []byte {
