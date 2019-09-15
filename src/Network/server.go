@@ -122,17 +122,18 @@ func runReceive(connect connection)  {
 			onClientDisconnected(connect)
 			return
 		}
-		//buf := make([]byte, len)
+		cmd := ByteToInt(bufInt)
 		slice1 := slice[0:len]
 		_, err = conn.Read(slice1)
 		if err != nil{
 			onClientDisconnected(connect)
 			return
 		}
-		fmt.Println(string(slice1[:]))
-		var data = CombineSend(pMove, slice1[:])
-		broadCastExcept(connect.uid, data)
+		//fmt.Println(string(slice1[:]))
+		//var data = CombineSend(pMove, slice1[:])
+		var data = BytesJoin(Int2Byte(len), Int2Byte(cmd), slice1[:])
+		broadCast(data)
 		//broadCast(data)
-		conn.Write(data)
+		//conn.Write(data)
 	}
 }
