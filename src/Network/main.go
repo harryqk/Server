@@ -28,8 +28,11 @@ func (m *namePrinter)Task()  {
 }
 
 func main(){
-
-	work.Start()
+	//TestByte2Int()
+	//TestInt2Byte()
+	//BraodCast()
+	//TestCombine()
+	Start()
 }
 
 
