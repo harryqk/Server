@@ -28,11 +28,8 @@ func (m *namePrinter)Task()  {
 }
 
 func main(){
-	//TestByte2Int()
-	//TestInt2Byte()
-	//BraodCast()
-	//TestCombine()
 	Start()
+	//testSlice()
 }
 
 
@@ -65,4 +62,17 @@ func testWork(){
 	end := time.Now()
 
 	log.Println(end.Sub(start))
+}
+
+func testSlice()  {
+	d := []byte{1,2,3,4}
+	data := make([]byte, 0)
+	data = BytesJoin(data, d)
+	log.Println(data)
+	data = append(data, 5)
+	log.Println(data)
+	data = make([]byte, 0)
+	log.Println(data)
+	data = BytesJoin(data, d)
+	log.Println(data)
 }

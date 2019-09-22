@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/gob"
 	"fmt"
 	"sync/atomic"
 	"time"
@@ -185,4 +186,14 @@ func TestByte2Int()  {
 
 	fmt.Println(Byte2Int(oneSerail))
 	fmt.Println(Byte2Int(oneSerail))
+}
+
+func GetBytes(key interface{}) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(key)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
