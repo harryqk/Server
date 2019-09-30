@@ -95,6 +95,11 @@ func onClientDisconnected(connect *connection){
 	connect.conn.Close()
 	mapConnected.Del(connect.uid)
 	PlayerLeave(connect)
+
+	if len(mapConnected.m) == 0 && quitSyncFrame != nil{
+		quitSyncFrame <- true
+		close(quitSyncFrame)
+	}
 	fmt.Println(strconv.Itoa(int(connect.uid)) + "client close")
 }
 

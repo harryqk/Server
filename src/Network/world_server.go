@@ -12,7 +12,7 @@ var(
 	quitSyncFrame chan bool
 	actionData []byte
 	lock sync.Mutex
-	started bool
+	isStarted  bool
 )
 
 
@@ -90,10 +90,10 @@ func StartGame()  {
 }
 
 func  InitWorld()  {
-	if started{
-		close(quitSyncFrame)
+	if isStarted{
+		fmt.Println("game started")
 	}
-	started = true
+	isStarted = true
 	StartGame()
 	NetWorkFrame = NewQueue()
 	quitSyncFrame = make(chan bool)
@@ -104,7 +104,6 @@ func  InitWorld()  {
 	//Time.Sleep(time.Second)
 	//quitSyncFrame <- true
 	//close(quitSyncFrame)
-	fmt.Println("started")
 }
 
 func syncFrame1()  {
@@ -161,12 +160,12 @@ func  syncFrame()  {
 	//s0 := time.Now()
 	go func() {
 		defer wg.Done()
-		for 	{
+		for _ = range ticker.C {
 				select {
 			case <-quitSyncFrame:
 				fmt.Println("close syncFrame1")
 				return
-			case <-ticker.C:
+			default:
 				var send []byte
 				if	len(actionData) == 0{
 					send = Int2Byte(0)
@@ -188,4 +187,5 @@ func  syncFrame()  {
 	//s2 := s0.Sub(s1)
 	//fmt.Println("run time", s2)
 	fmt.Println("close syncFrame2")
+	isStarted = false
 }
