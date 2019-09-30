@@ -10,6 +10,8 @@ import (
 var(
 	NetWorkFrame *Queue
 	quitSyncFrame chan bool
+	actionData []byte
+	lock sync.Mutex
 )
 
 
@@ -31,6 +33,11 @@ func PlayerLeave(connection *connection)  {
 	//var data = CombineSend(pPlayerLeave, []byte(strconv.Itoa(int(connection.uid)) + "leave"))
 	var data = CombineSend(pPlayerLeave, Int2Byte(connection.uid))
 	broadCastExcept(connection.uid, data)
+}
+
+func  playerUpdate(connection *connection, data []byte)  {
+	var send = BytesJoin(Int2Byte(connection.uid), data)
+	setActionData(send)
 }
 
 func AddExistPLayer(conns mapConn, connection *connection) {
@@ -60,6 +67,21 @@ func RemovePlayer(connection *connection) {
 	connection.conn.Write(data)
 }
 
+func  setActionData(new []byte)  {
+	lock.Lock()
+	defer lock.Unlock()
+	if len(new) == 0{
+		actionData = make([]byte, 0)
+	} else{
+		actionData = BytesJoin(actionData, new)
+	}
+}
+
+func  clearActionData()  {
+	lock.Lock()
+	defer lock.Unlock()
+}
+
 
 func StartGame()  {
 	var data = CombineSend(pStartGame, []byte("start game"))
@@ -79,7 +101,7 @@ func  InitWorld()  {
 	//close(quitSyncFrame)
 }
 
-func syncFrame()  {
+func syncFrame1()  {
 	ticker := time.NewTicker(time.Millisecond * 250)
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -124,4 +146,39 @@ func  collectFrameData()[]byte  {
 	}
 
 	return CombineSend(pMove, BytesJoin(Int2Byte(int32(num)), data))
+}
+
+func  syncFrame()  {
+	ticker := time.NewTicker(time.Millisecond * 50)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	//s0 := time.Now()
+	go func() {
+		defer wg.Done()
+		for _ = range ticker.C {
+			select {
+			case <-quitSyncFrame:
+				fmt.Println("close receve")
+				return
+			default:
+				var send []byte
+				if	len(actionData) == 0{
+					send = Int2Byte(0)
+				} else{
+					send = BytesJoin(Int2Byte(1), actionData)
+				}
+				var empty []byte
+				setActionData(empty)
+				send = CombineSend(pUpdate, send)
+				broadCast(send)
+				NetWorkFrame.push(send)
+			}
+
+		}
+	}()
+
+	wg.Wait()
+	//s1 := time.Now()
+	//s2 := s0.Sub(s1)
+	//fmt.Println("run time", s2)
 }

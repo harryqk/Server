@@ -13,7 +13,10 @@ func Deserialize(conn *connection, contentLen int32, proto int32, data []byte)  
 		PlayerJoin(conn)
 	}else if proto == pPlayerLeave{
 		PlayerLeave(conn)
+	} else if proto == pUpdate{
+		playerUpdate(conn, data)
 	} else if proto == pStartGame{
 		InitWorld()
 	}
+
 }
