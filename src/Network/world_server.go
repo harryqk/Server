@@ -12,6 +12,7 @@ var(
 	quitSyncFrame chan bool
 	actionData []byte
 	lock sync.Mutex
+	syncTimer time.Ticker
 )
 
 
@@ -158,7 +159,7 @@ func  syncFrame()  {
 		for _ = range ticker.C {
 			select {
 			case <-quitSyncFrame:
-				fmt.Println("close receve")
+				fmt.Println("close syncFrame2")
 				return
 			default:
 				var send []byte
