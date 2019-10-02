@@ -101,6 +101,7 @@ func StartGame()  {
 func  InitWorld()  {
 	if isStarted{
 		fmt.Println("game started")
+		return
 	}
 	isStarted = true
 	StartGame()
