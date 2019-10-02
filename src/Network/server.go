@@ -48,6 +48,12 @@ func (c *mapConn) Del(key int32) {
 	delete(c.m, key)
 }
 
+func (c *mapConn) getLen() int  {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	return len(c.m)
+}
+
 var mapConnected = mapConn{
 	m : make(map[int32] *connection),
 }
@@ -96,9 +102,10 @@ func onClientDisconnected(connect *connection){
 	mapConnected.Del(connect.uid)
 	PlayerLeave(connect)
 
-	if len(mapConnected.m) == 0 && quitSyncFrame != nil{
+	if mapConnected.getLen() == 0 && quitSyncFrame != nil{
 		quitSyncFrame <- true
 		close(quitSyncFrame)
+		quitSyncFrame = nil
 	}
 	fmt.Println(strconv.Itoa(int(connect.uid)) + "client close")
 }
