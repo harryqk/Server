@@ -49,9 +49,17 @@ func (c *mapConn) Del(key int32) {
 }
 
 func (c *mapConn) getLen() int  {
-	c.lock.Lock()
-	defer c.lock.Unlock()
+	c.lock.RLock()
+	defer c.lock.RUnlock()
 	return len(c.m)
+}
+
+func (c *mapConn) Range(f func(key, value interface{}) bool) {
+	c.lock.RLock()
+	for k, v := range c.m {
+		f(k, v)
+	}
+	c.lock.RUnlock()
 }
 
 var mapConnected = mapConn{
